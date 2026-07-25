@@ -529,7 +529,7 @@
           <input type="text" id="referencia" class="form-control" placeholder="Ej. Frente a la tienda La Bendición" required>
         </div>
 
-        <button type="submit" class="btn-submit">
+        <button type="submit"  id="btnSubmit" class="btn-submit">
           🛒 CONFIRMAR PEDIDO (Q300)
         </button>
       </form>
@@ -589,46 +589,108 @@
     <a href="#order-form" class="sticky-btn">PEDIR AHORA 🛒</a>
   </div>
 
-  <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwFSpJ4HE_putESRj2wEmpYDV0al-Fh8pZN8hlIT88fp_THpym-FP--ptcieDZPCmuEQw/exec";
-    function getParams() {
-      const params = new URLSearchParams(window.location.search);
-      return {
-        source: params.get("source"),
-        campaign: params.get("campaign"),
-        adset: params.get("adset"),
-        ad: params.get("ad")
-      };
-    }
+<script>
+const scriptURL = "https://script.google.com/macros/s/AKfycbwFSpJ4HE_putESRj2wEmpYDV0al-Fh8pZN8hlIT88fp_THpym-FP--ptcieDZPCmuEQw/exec";
 
-    function handleFormSubmit(event) {
+let isSubmitting = false;
+
+function getParams() {
+  const params = new URLSearchParams(window.location.search);
+
+  return {
+    source: params.get("source") || "Facebook",
+    campaign: params.get("campaign") || "Test1",
+    adset: params.get("adset") || "Broad",
+    ad: params.get("ad") || "Video1"
+  };
+}
+
+
+function handleFormSubmit(event) {
+
   event.preventDefault();
+
+  // Prevent multiple submissions
+  if (isSubmitting) {
+    return;
+  }
+
+  isSubmitting = true;
+
+  const btn = document.getElementById("btnSubmit");
+
+  // Disable button
+  btn.disabled = true;
+  btn.style.opacity = "0.6";
+  btn.style.cursor = "not-allowed";
+  btn.innerText = "PROCESANDO PEDIDO...";
+
 
   const tracking = getParams();
 
+
   const data = {
+
     fullName: document.getElementById("fullName").value,
     phone: document.getElementById("phone").value,
+
     departamento: document.getElementById("departamento").value,
     municipio: document.getElementById("municipio").value,
     colonia: document.getElementById("colonia").value,
     direccion: document.getElementById("direccion").value,
     referencia: document.getElementById("referencia").value,
+
+    pais: "Guatemala",
+    producto: "Reloj Dragon 3D",
+    precio: 300,
+
     ...tracking
   };
+
 
   fetch(scriptURL, {
     method: "POST",
     body: JSON.stringify(data)
   })
-  .then(res => {
-    fbq('track', 'Lead');
+
+  .then(() => {
+
+    // Meta Pixel Lead event
+    if (typeof fbq === "function") {
+      fbq('track', 'Lead', {
+        content_name: 'Reloj Dragon 3D',
+        value: 300,
+        currency: 'GTQ'
+      });
+    }
+
+
     alert("✅ Pedido enviado correctamente");
+
     document.getElementById("codForm").reset();
+
+    // Optional redirect:
+    // window.location.href="/gracias.html";
+
   })
+
+
   .catch(err => {
+
+    console.error(err);
+
     alert("❌ Error al enviar. Intenta de nuevo.");
+
+    // Allow retry only if failed
+    isSubmitting = false;
+
+    btn.disabled = false;
+    btn.style.opacity = "1";
+    btn.style.cursor = "pointer";
+    btn.innerText = "🛒 CONFIRMAR PEDIDO (Q300)";
+
   });
+
 }
 </script>
 </body>
