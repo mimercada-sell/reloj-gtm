@@ -672,8 +672,11 @@ function handleFormSubmit(event) {
     alert("✅ Pedido enviado correctamente");
 
     document.getElementById("codForm").reset();
-  btn.disabled = false;
+    isSubmitting = false;
 
+    btn.disabled = false;
+    btn.style.pointerEvents = "auto";
+    btn.innerText = '🛒 CONFIRMAR PEDIDO (Q300)';
     // Optional redirect:
     // window.location.href="/gracias.html";
 
