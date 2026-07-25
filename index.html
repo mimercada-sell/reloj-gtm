@@ -602,10 +602,10 @@ function getParams() {
   const params = new URLSearchParams(window.location.search);
 
   return {
-    source: params.get("source") || "Facebook",
-    campaign: params.get("campaign") || "Test1",
-    adset: params.get("adset") || "Broad",
-    ad: params.get("ad") || "Video1"
+    source: params.get("utm_source") || "Facebook",
+    campaign: params.get("utm_campaign") || "Test1",
+    adset: params.get("utm_adset") || "Broad",
+    ad: params.get("utm_ad") || "Video1"
   };
 }
 
